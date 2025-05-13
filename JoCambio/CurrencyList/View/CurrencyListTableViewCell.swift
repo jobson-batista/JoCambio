@@ -25,7 +25,7 @@ class CurrencyListTableViewCell: UITableViewCell, UIViewProtocol {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .white
-        label.font = .systemFont(ofSize:20, weight: .medium)
+        label.font = .systemFont(ofSize:16, weight: .medium)
         return label
     }()
     

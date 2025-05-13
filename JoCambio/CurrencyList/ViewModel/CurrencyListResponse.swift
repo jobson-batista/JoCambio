@@ -5,13 +5,13 @@
 //  Created by Jobson on 13/05/25.
 //
 
-class CurrencyListResponse{
+class CurrencyListResponse: Codable {
     
-    let name: String
-    let code: String
+    let success: Bool
+    let currencies: [String: String]
     
-    init(name: String, code: String) {
-        self.name = name
-        self.code = code
+    init(success: Bool, currencies: [String : String]) {
+        self.success = success
+        self.currencies = currencies
     }
 }
