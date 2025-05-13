@@ -5,7 +5,7 @@
 //  Created by Jobson on 12/05/25.
 //
 
-protocol UIViewControllerProtocol {
+protocol UIViewProtocol {
     
     func setupConstraints()
     func setupHierarchy()
