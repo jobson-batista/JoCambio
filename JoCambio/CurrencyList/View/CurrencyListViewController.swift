@@ -91,7 +91,7 @@ extension CurrencyListViewController: UITableViewDelegate, UITableViewDataSource
         
         let arrayCurrencies = Array(currenciesArray).sorted { $0.value < $1.value  }
         
-        let currency = currenciesArray[indexPath.row]
+        let currency = arrayCurrencies[indexPath.row]
         cell.setLabelCell(name: currency.value, code: currency.key)
         
         cell.layer.cornerRadius = 8
