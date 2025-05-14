@@ -9,8 +9,7 @@ import UIKit
 
 class CurrencyListViewController: UIViewController, UIViewProtocol {
     
-    let names = ["Dolar","Euro", "Real"]
-    let codes = ["USD","EUR","BRL"]
+    var currenciesArray: [(key: String, value: String)] = []
     
     private lazy var stackView: UIStackView = {
         let stackView = UIStackView()
@@ -38,6 +37,9 @@ class CurrencyListViewController: UIViewController, UIViewProtocol {
         
         setupHierarchy()
         setupConstraints()
+        Task {
+            await fetchData()
+        }
     }
     
     func setupHierarchy() {
@@ -59,8 +61,17 @@ class CurrencyListViewController: UIViewController, UIViewProtocol {
             currencyListTableView.trailingAnchor.constraint(equalTo: stackView.trailingAnchor),
             currencyListTableView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor),
             
-            
         ])
+    }
+    
+    func fetchData() async {
+        do {
+            let fetchedCurrencies = try await CurrencyListService.shared.fetchCurrencies()
+            self.currenciesArray = Array(fetchedCurrencies).sorted { $0.value < $1.value }
+            self.currencyListTableView.reloadData()
+        } catch {
+            print("Erro ao carregar currencies: \(error)")
+        }
     }
     
 }
@@ -69,18 +80,20 @@ class CurrencyListViewController: UIViewController, UIViewProtocol {
 extension CurrencyListViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return codes.count
+        return self.currenciesArray.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "CurrencyListTableViewCell", for: indexPath) as? CurrencyListTableViewCell else {
             return UITableViewCell()
         }
         
-        let code = codes[indexPath.row]
-        let name = names[indexPath.row]
+        let arrayCurrencies = Array(currenciesArray).sorted { $0.value < $1.value  }
         
-        cell.setLabelCell(name: name, code: code)
+        let currency = arrayCurrencies[indexPath.row]
+        cell.setLabelCell(name: currency.value, code: currency.key)
+        
         cell.layer.cornerRadius = 8
         cell.clipsToBounds = true
         

@@ -20,9 +20,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(frame: windowScene.coordinateSpace.bounds)
         window?.windowScene = windowScene
         
-        let currencyViewController = CurrencyListViewController()
+//        let currencyViewController = CurrencyListViewController()
+        let currencyConverterViewController = CurrencyConverterViewController()
         
-        window?.rootViewController = currencyViewController
+        window?.rootViewController = currencyConverterViewController
         window?.makeKeyAndVisible()
     }
 
