@@ -9,6 +9,8 @@ import UIKit
 
 class CurrencyConverterViewController: UIViewController, UIViewProtocol {
     
+    private var currenciesList: [(key: String, value: String)] = []
+    
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -67,13 +69,7 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.backgroundColor = .clear
         button.tintColor = .primaryText
-        button.setTitle("BRL", for: .normal)
         button.showsMenuAsPrimaryAction = true
-        button.menu = UIMenu(title: "", children: [
-            UIAction(title: "USD - United States Dollar", handler: {_ in button.setTitle("USD", for: .normal)}),
-            UIAction(title: "EUR - Euro", handler: {_ in button.setTitle("EUR", for: .normal)}),
-            UIAction(title: "BRL - Brazilian Real", handler: {_ in button.setTitle("BRL", for: .normal)}),
-        ])
         button.layer.cornerRadius = 5
         button.layer.borderWidth = 0.5
         button.layer.borderColor = CGColor(red: 1, green: 1, blue: 1, alpha: 1)
@@ -85,13 +81,7 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.backgroundColor = .clear
         button.tintColor = .white
-        button.setTitle("USD", for: .normal)
         button.showsMenuAsPrimaryAction = true
-        button.menu = UIMenu(title: "", children: [
-            UIAction(title: "USD - United States Dollar", handler: {_ in button.setTitle("USD", for: .normal)}),
-            UIAction(title: "EUR - Euro", handler: {_ in button.setTitle("EUR", for: .normal)}),
-            UIAction(title: "BRL - Brazilian Real", handler: {_ in button.setTitle("BRL", for: .normal)}),
-        ])
         button.layer.cornerRadius = 5
         button.layer.borderWidth = 0.5
         button.layer.borderColor = CGColor(red: 1, green: 1, blue: 1, alpha: 1)
@@ -176,6 +166,7 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
         setupConstraints()
         setupKeyboardObservers()
         setupDismissKeyboardOnTap()
+        setupCurrencyMenu()
     }
     
     func setupConstraints() {
@@ -266,16 +257,14 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
     
     @objc private func keyboardWillShow(notification: Notification) {
         if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
-            print("Antes contentInset = \(scrollView.contentInset)")
             scrollView.contentInset.bottom = keyboardFrame.height + 20
-            print("Depois contentInset = \(scrollView.contentInset)")
-            print("Teclado apareceu")
+            Log.info("Teclado apareceu")
         }
     }
     
     @objc private func keyboardWillHide(notification: Notification) {
         scrollView.contentInset.bottom = 0
-        print("Teclado sumiu")
+        Log.info("Teclado sumiu")
     }
     
     deinit {
@@ -284,6 +273,37 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
     
     @objc func dismissKeyboard() {
         view.endEditing(true)
+    }
+    
+    private func getCurrenciesList() async {
+        do {
+            let data = try await CurrencyListService.shared.fetchCurrencies()
+            self.currenciesList = Array(data).sorted { $0.key < $1.key }
+            Log.info("Lista de moedas carregada com sucesso!")
+        } catch {
+            Log.error("Erro ao carregar Currencies List: \(error)")
+        }
+    }
+    
+    private func getUIActionCurrencies(button: UIButton) async -> [UIAction] {
+        var actions: [UIAction] = []
+        
+        for (key, value) in self.currenciesList {
+            actions.append(UIAction(title: "\(key) - \(value)", handler: { _ in button.setTitle(key, for: .normal)}))
+        }
+        return actions
+    }
+    
+    func setupCurrencyMenu() {
+        
+        Task {
+            await getCurrenciesList()
+            
+            toCurrencyButton.menu = UIMenu(title: "Moeda de Destino", children: await getUIActionCurrencies(button: toCurrencyButton))
+            
+            fromCurrencyButton.menu = UIMenu(title: "Moeda de Origem", children: await getUIActionCurrencies(button: fromCurrencyButton))
+        }
+
     }
     
 }
