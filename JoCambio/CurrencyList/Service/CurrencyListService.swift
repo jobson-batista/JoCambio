@@ -10,7 +10,7 @@ import Foundation
 class CurrencyListService {
     
     private let URL_API = "https://raw.githubusercontent.com/Banking-iOS/mock-interview/main/api/list.json"
-    static let shared = CurrencyListService() // Única instancia. Semelhante ao Singleton
+    static let shared = CurrencyListService() // Única instancia. Implementacao do Singleton
     
     public var currencies: [String:String]?
     
