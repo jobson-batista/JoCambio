@@ -22,16 +22,23 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
         return view
     }()
     
+    private lazy var spaceView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     private lazy var stackView: UIStackView = {
         let stackView = UIStackView()
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .vertical
         stackView.spacing = 20
-        stackView.backgroundColor = .thePrimary
+        stackView.backgroundColor = .clear
         stackView.alignment = .center
         stackView.isLayoutMarginsRelativeArrangement = true
         stackView.layoutMargins = UIEdgeInsets(top: 20, left: 0, bottom: 20, right: 0)
         stackView.layer.cornerRadius = 10
+        stackView.layer.borderColor = CGColor(red: 1, green: 1, blue: 1, alpha: 1)
         return stackView
     }()
     
@@ -41,15 +48,7 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
         stackView.axis = .horizontal
         stackView.spacing = 10
         stackView.distribution = .fillEqually
-        return stackView
-    }()
-    
-    private lazy var stackViewListCurrencies: UIStackView = {
-        let stackView = UIStackView()
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.axis = .horizontal
-        stackView.spacing = 10
-        stackView.distribution = .fillEqually
+        stackView.alignment = .center
         return stackView
     }()
     
@@ -66,8 +65,9 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
     private lazy var fromCurrencyButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.backgroundColor = .success
-        button.setTitle("Origem", for: .normal)
+        button.backgroundColor = .clear
+        button.tintColor = .primaryText
+        button.setTitle("BRL", for: .normal)
         button.showsMenuAsPrimaryAction = true
         button.menu = UIMenu(title: "", children: [
             UIAction(title: "USD - United States Dollar", handler: {_ in button.setTitle("USD", for: .normal)}),
@@ -75,14 +75,17 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
             UIAction(title: "BRL - Brazilian Real", handler: {_ in button.setTitle("BRL", for: .normal)}),
         ])
         button.layer.cornerRadius = 5
+        button.layer.borderWidth = 0.5
+        button.layer.borderColor = CGColor(red: 1, green: 1, blue: 1, alpha: 1)
         return button
     }()
     
     private lazy var toCurrencyButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.backgroundColor = .success
-        button.setTitle("Destino", for: .normal)
+        button.backgroundColor = .clear
+        button.tintColor = .white
+        button.setTitle("USD", for: .normal)
         button.showsMenuAsPrimaryAction = true
         button.menu = UIMenu(title: "", children: [
             UIAction(title: "USD - United States Dollar", handler: {_ in button.setTitle("USD", for: .normal)}),
@@ -90,12 +93,14 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
             UIAction(title: "BRL - Brazilian Real", handler: {_ in button.setTitle("BRL", for: .normal)}),
         ])
         button.layer.cornerRadius = 5
+        button.layer.borderWidth = 0.5
+        button.layer.borderColor = CGColor(red: 1, green: 1, blue: 1, alpha: 1)
         return button
     }()
     
     private lazy var imageConverterImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "arrow.left.arrow.right.circle.fill")
+        imageView.image = UIImage(systemName: "chevron.forward.dotted.chevron.forward")
         imageView.tintColor = .white
         imageView.contentMode = .scaleAspectFit
         return imageView
@@ -114,9 +119,11 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.keyboardType = .numbersAndPunctuation
-        textField.borderStyle = .roundedRect
         textField.backgroundColor = .white
         textField.clearButtonMode = .whileEditing
+        textField.layer.borderWidth = 1
+        textField.layer.cornerRadius = 5
+        textField.layer.borderColor = CGColor(red: 0.353, green: 0.353, blue: 0.369, alpha: 1)
         return textField
     }()
     
@@ -133,17 +140,31 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.isEnabled = false
-        textField.borderStyle = .roundedRect
-        textField.backgroundColor = .disable
+        textField.backgroundColor = .clear
+        textField.layer.borderWidth = 1
+        textField.layer.cornerRadius = 5
+        textField.layer.borderColor = CGColor(red: 0.353, green: 0.353, blue: 0.369, alpha: 1)
         return textField
     }()
     
-    private lazy var goToListCurrencies: UIButton = {
+    private lazy var convertButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Ver todas as moedas", for: .normal)
+        button.setTitle("  Converter", for: .normal)
+        button.backgroundColor = .clear
+        button.layer.cornerRadius = 5
+        button.tintColor = .white
+        button.layer.borderWidth = 0.5
+        button.layer.borderColor = CGColor(red: 1, green: 1, blue: 1, alpha: 1)
+        return button
+    }()
+    
+    private lazy var goToListCurrenciesButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("  Ver todas as moedas", for: .normal)
         button.backgroundColor = .clear
         button.setTitleColor(.white, for: .normal)
-//        button.setImage(UIImage(named: "arrowshape.turn.up.forward"), for: .normal)
+        button.setImage(UIImage(systemName: "eyes.inverse"), for: .normal)
+        button.tintColor = .white
         return button
     }()
     
@@ -172,13 +193,13 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
             contentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
             contentView.heightAnchor.constraint(greaterThanOrEqualTo: scrollView.heightAnchor),
             
-            // Agora, stackView ANCORADA no contentView corretamente (com padding)
             stackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             
             stackViewButtons.leadingAnchor.constraint(equalTo: stackView.leadingAnchor, constant: 40),
             stackViewButtons.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: -40),
+            stackViewButtons.heightAnchor.constraint(equalToConstant: 40),
             
             titleLabel.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: -40),
             titleLabel.leadingAnchor.constraint(equalTo: stackView.leadingAnchor, constant: 40),
@@ -197,7 +218,15 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
             toCurrencyTextField.leadingAnchor.constraint(equalTo: stackView.leadingAnchor, constant: 40),
             toCurrencyTextField.heightAnchor.constraint(equalToConstant: 40),
             
-            goToListCurrencies.heightAnchor.constraint(equalToConstant: 40)
+            goToListCurrenciesButton.heightAnchor.constraint(equalToConstant: 40),
+            
+            convertButton.heightAnchor.constraint(equalToConstant: 40),
+            convertButton.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: -40),
+            convertButton.leadingAnchor.constraint(equalTo: stackView.leadingAnchor, constant: 40),
+            
+            imageConverterImageView.heightAnchor.constraint(equalToConstant: 20),
+            
+            spaceView.heightAnchor.constraint(equalToConstant: 30),
             
         ])
     }
@@ -208,12 +237,14 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
         stackViewButtons.addArrangedSubview(toCurrencyButton)
         
         stackView.addArrangedSubview(titleLabel)
+        stackView.addArrangedSubview(spaceView)
         stackView.addArrangedSubview(stackViewButtons)
         stackView.addArrangedSubview(fromCurrencyLabel)
         stackView.addArrangedSubview(fromCurrencyTextField)
         stackView.addArrangedSubview(toCurrencyLabel)
         stackView.addArrangedSubview(toCurrencyTextField)
-        stackView.addArrangedSubview(goToListCurrencies)
+        stackView.addArrangedSubview(convertButton)
+        stackView.addArrangedSubview(goToListCurrenciesButton)
         
         contentView.addSubview(stackView)
         

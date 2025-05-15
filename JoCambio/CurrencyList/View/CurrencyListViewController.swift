@@ -37,6 +37,7 @@ class CurrencyListViewController: UIViewController, UIViewProtocol {
         
         setupHierarchy()
         setupConstraints()
+        
         Task {
             await fetchData()
         }
