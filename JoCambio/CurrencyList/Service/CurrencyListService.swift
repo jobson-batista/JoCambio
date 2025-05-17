@@ -21,6 +21,8 @@ class CurrencyListService {
             throw URLError(.badURL)
         }
         
+        Log.info("Requisição feita em \(url)")
+        
         let (data, _) = try await URLSession.shared.data(from: url)
         let result = try JSONDecoder().decode(CurrencyListResponse.self, from: data)
         return result.currencies
