@@ -50,5 +50,5 @@ JoCambio é um app de conversão de moedas que permite ao usuário consultar tax
 
 ## Esse projeto é a resolução do Desafio do BTG Pactual para vaga de Dev Mobile (iOS ou Android)
 
-* Veja o desafio técnico [aqui]([url](https://github.com/btg-mobile/mobile-challenge))
+* Veja o desafio técnico [aqui](https://github.com/btg-mobile/mobile-challenge)
 
