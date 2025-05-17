@@ -73,6 +73,7 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
         button.layer.cornerRadius = 5
         button.layer.borderWidth = 0.5
         button.layer.borderColor = CGColor(red: 1, green: 1, blue: 1, alpha: 1)
+        button.setTitle("USD", for: .normal)
         return button
     }()
     
@@ -85,6 +86,7 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
         button.layer.cornerRadius = 5
         button.layer.borderWidth = 0.5
         button.layer.borderColor = CGColor(red: 1, green: 1, blue: 1, alpha: 1)
+        button.setTitle("BRL", for: .normal)
         return button
     }()
     
@@ -107,6 +109,7 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
     
     private lazy var fromCurrencyTextField: UITextField = {
         let textField = UITextField()
+        
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.keyboardType = .numbersAndPunctuation
         textField.backgroundColor = .white
@@ -114,6 +117,13 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
         textField.layer.borderWidth = 1
         textField.layer.cornerRadius = 5
         textField.layer.borderColor = CGColor(red: 0.353, green: 0.353, blue: 0.369, alpha: 1)
+        textField.text = "1"
+        
+        // Adicionar padding a esquerda
+        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: textField.frame.height))
+        textField.leftView = paddingView
+        textField.leftViewMode = .always
+        
         return textField
     }()
     
@@ -131,9 +141,15 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.isEnabled = false
         textField.backgroundColor = .clear
+        textField.textColor = .white
         textField.layer.borderWidth = 1
         textField.layer.cornerRadius = 5
         textField.layer.borderColor = CGColor(red: 0.353, green: 0.353, blue: 0.369, alpha: 1)
+        
+        // Adicionar padding a esquerda
+        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: textField.frame.height))
+        textField.leftView = paddingView
+        textField.leftViewMode = .always
         return textField
     }()
     
@@ -145,6 +161,7 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
         button.tintColor = .white
         button.layer.borderWidth = 0.5
         button.layer.borderColor = CGColor(red: 1, green: 1, blue: 1, alpha: 1)
+        button.addTarget(self, action: #selector(convertCurrency), for: .touchUpInside)
         return button
     }()
     
@@ -155,6 +172,7 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
         button.setTitleColor(.white, for: .normal)
         button.setImage(UIImage(systemName: "eyes.inverse"), for: .normal)
         button.tintColor = .white
+        button.addTarget(self, action: #selector(goToListCurrencies), for: .touchUpInside)
         return button
     }()
     
@@ -167,6 +185,7 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
         setupKeyboardObservers()
         setupDismissKeyboardOnTap()
         setupCurrencyMenu()
+        convertCurrency()
     }
     
     func setupConstraints() {
@@ -289,7 +308,10 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
         var actions: [UIAction] = []
         
         for (key, value) in self.currenciesList {
-            actions.append(UIAction(title: "\(key) - \(value)", handler: { _ in button.setTitle(key, for: .normal)}))
+            actions.append(UIAction(title: "\(key) - \(value)", handler: { _ in
+                button.setTitle(key, for: .normal)
+                button.isSelected = true
+            }))
         }
         return actions
     }
@@ -306,4 +328,36 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
 
     }
     
+    @objc func convertCurrency() {
+        Task {
+            
+            var result = 0.0
+            let code = toCurrencyButton.titleLabel?.text ?? "USD"
+            let symbol: String = CurrencyLiveService.shared.getSymbolCurrency(code: code)
+            let formatter = NumberFormatter()
+            
+            if let fromText = fromCurrencyTextField.text, let value = Double(fromText)  {
+                result = try await CurrencyLiveService.shared.convert(value: value, from: fromCurrencyButton.titleLabel?.text ?? "USD", to: toCurrencyButton.titleLabel?.text ?? "BRL")
+            } else {
+                Log.error("O valor de 'fromCurrencyTextField.text' não pode ser convertido.")
+            }
+            
+            formatter.numberStyle = .decimal
+            formatter.minimumFractionDigits = 2
+            formatter.maximumFractionDigits = 2
+            
+            if let formatedResult = formatter.string(from: NSNumber(value: result)) {
+                toCurrencyTextField.text = "\(symbol) \(formatedResult)"
+            }
+            
+        }
+    }
+    
+    @objc func goToListCurrencies() {
+        Log.info("Clicou em goToListCurrencies!")
+    }
+    
+    func setupTextFields() {
+        toCurrencyTextField.text = "$ 1,00"
+    }
 }
