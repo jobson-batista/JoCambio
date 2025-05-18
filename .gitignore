@@ -1,28 +1,41 @@
-# Xcode
-.DS_Store
-build/
-DerivedData/
-*.pbxuser
-!default.pbxuser
-*.mode1v3
-!default.mode1v3
-*.mode2v3
-!default.mode2v3
-*.perspectivev3
-!default.perspectivev3
-xcuserdata/
+# === Xcode ===
+*.xcuserstate
 *.xccheckout
 *.moved-aside
-*.xcuserstate
-*.xcscmblueprint
+*.xcworkspace/xcuserdata/
+*.xcuserdatad/
+xcuserdata/
 
-# SwiftPM
+# Project user data
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.pbxuser
+
+# Build products
+build/
+DerivedData/
+*.hmap
+*.ipa
+*.app
+*.dSYM.zip
+*.dSYM
+
+# Index and logs
+.idea/
+*.xcscmblueprint
+*.xcsettings
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# Swift Package Manager
+.swiftpm/
 .build/
-.swiftpm/xcode/package.xcworkspace/
 
 # CocoaPods
 Pods/
 Podfile.lock
+Podfile~
+project.xcworkspace/
 
 # Carthage
 Carthage/Build/
@@ -30,18 +43,19 @@ Carthage/Build/
 # Fastlane
 fastlane/report.xml
 fastlane/Preview.html
-fastlane/screenshots
-fastlane/test_output
+fastlane/screenshots/
+fastlane/test_output/
 
-# SPM Artifacts
-*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+# Firebase crashlytics
+*.symbols
 
-# Xcode Preview files
-*.xcpreview
+# Archives
+*.xcarchive
 
-# XCFrameworks (se geradas localmente)
-*.xcframework
+# Xcode automatic backup files
+*.xcbackup
 
-# Simulator logs / state
-coreSimulatorLogs/
-
+# Misc
+.DS_Store
+*.orig
+*.swp
