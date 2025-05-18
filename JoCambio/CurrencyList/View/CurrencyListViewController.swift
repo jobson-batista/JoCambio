@@ -7,9 +7,12 @@
 
 import UIKit
 
-class CurrencyListViewController: UIViewController, UIViewProtocol {
+class CurrencyListViewController: UIViewController, UIViewProtocol, UISearchResultsUpdating {
+    
+    let searchController = UISearchController(searchResultsController: nil)
     
     var currenciesArray: [(key: String, value: String)] = []
+    var filtredCurrencies: [(key: String, value: String)] = []
     
     private lazy var stackView: UIStackView = {
         let stackView = UIStackView()
@@ -37,10 +40,27 @@ class CurrencyListViewController: UIViewController, UIViewProtocol {
         
         setupHierarchy()
         setupConstraints()
+        setupSearchBar()
         
         Task {
             await fetchData()
         }
+    }
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        
+        guard let query = searchController.searchBar.text else { return }
+        
+        if query.isEmpty {
+            filtredCurrencies = currenciesArray
+        } else {
+            filtredCurrencies = currenciesArray.filter { (key, value) in
+                print("key = \(key)\t value = \(value)")
+                return key.lowercased().contains(query.lowercased()) || value.lowercased().contains(query.lowercased())
+            }
+        }
+        
+        currencyListTableView.reloadData()
     }
     
     func setupHierarchy() {
@@ -69,10 +89,40 @@ class CurrencyListViewController: UIViewController, UIViewProtocol {
         do {
             let fetchedCurrencies = try await CurrencyListService.shared.fetchCurrencies()
             self.currenciesArray = Array(fetchedCurrencies).sorted { $0.value < $1.value }
+            self.filtredCurrencies = self.currenciesArray
             self.currencyListTableView.reloadData()
         } catch {
             print("Erro ao carregar currencies: \(error)")
         }
+    }
+    
+    func setupSearchBar() {
+        searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = "Search a currency or code"
+        searchController.searchBar.tintColor = .white
+        searchController.searchBar.searchTextField.textColor = .white
+        
+        searchController.searchBar.searchTextField.attributedPlaceholder = NSAttributedString(
+            string: "Search a currency or code",
+            attributes: [.foregroundColor: UIColor.white]
+        )
+        
+        if let leftView = searchController.searchBar.searchTextField.leftView as? UIImageView {
+            leftView.tintColor = .white
+        }
+        
+        navigationItem.hidesSearchBarWhenScrolling = false
+        navigationItem.searchController = searchController
+        definesPresentationContext = true
+    }
+    
+    // é chamado depois que a view já está no layout
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+
+        let textField = searchController.searchBar.searchTextField
+        textField.textColor = .white
     }
     
 }
@@ -81,7 +131,7 @@ class CurrencyListViewController: UIViewController, UIViewProtocol {
 extension CurrencyListViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.currenciesArray.count
+        return self.filtredCurrencies.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -90,7 +140,7 @@ extension CurrencyListViewController: UITableViewDelegate, UITableViewDataSource
             return UITableViewCell()
         }
         
-        let arrayCurrencies = Array(currenciesArray).sorted { $0.value < $1.value  }
+        let arrayCurrencies = Array(filtredCurrencies).sorted { $0.value < $1.value  }
         
         let currency = arrayCurrencies[indexPath.row]
         cell.setLabelCell(name: currency.value, code: currency.key)

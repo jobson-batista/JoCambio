@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "logo@3x.png",
+      "filename" : "logo@3x 3.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -13,7 +13,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "logoDark@3x.png",
+      "filename" : "logoDark@3x 2.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -25,7 +25,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "logo@3x 1.png",
+      "filename" : "logo@3x 2.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
