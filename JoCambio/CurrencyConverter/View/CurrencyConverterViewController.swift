@@ -11,6 +11,8 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
     
     private var currenciesList: [(key: String, value: String)] = []
     
+    public var coordinator: AppCoordinator?
+    
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -355,6 +357,7 @@ class CurrencyConverterViewController: UIViewController, UIViewProtocol {
     
     @objc func goToListCurrencies() {
         Log.info("Clicou em goToListCurrencies!")
+        coordinator?.goToCurrencyList()
     }
     
     func setupTextFields() {
