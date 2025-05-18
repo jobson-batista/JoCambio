@@ -55,7 +55,6 @@ class CurrencyListViewController: UIViewController, UIViewProtocol, UISearchResu
             filtredCurrencies = currenciesArray
         } else {
             filtredCurrencies = currenciesArray.filter { (key, value) in
-                print("key = \(key)\t value = \(value)")
                 return key.lowercased().contains(query.lowercased()) || value.lowercased().contains(query.lowercased())
             }
         }
